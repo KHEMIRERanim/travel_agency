@@ -8,6 +8,7 @@ import java.sql.SQLException;
 public class Main {
     public static void main(String[] args) {
        ServiceFlight servicePersonne = new ServiceFlight();
+
 /*
         try {
            servicePersonne.ajouter(new Flight(20 ,"moncer","dridi"));
@@ -21,4 +22,5 @@ public class Main {
 
     }*/
         System.out.println("Hello World!");
+
 }}
