@@ -60,14 +60,14 @@ public class ServiceFlight implements IService<Flight> {
 
 
 
-@Override
-public void supprimer(Flight flight) throws SQLException {
-    String req = "DELETE FROM flight WHERE flight_id=?";
-    PreparedStatement ps = con.prepareStatement(req);
-    ps.setInt(1, flight.getFlight_id());
-    ps.executeUpdate();
-    System.out.println("Vol supprimé");
-}
+    @Override
+    public void supprimer(Flight flight) throws SQLException {
+        String req = "DELETE FROM flight WHERE flight_id=?";
+        PreparedStatement ps = con.prepareStatement(req);
+        ps.setInt(1, flight.getFlight_id());
+        ps.executeUpdate();
+        System.out.println("Vol supprimé");
+    }
 
 
     @Override
