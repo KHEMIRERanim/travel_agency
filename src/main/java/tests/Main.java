@@ -1,39 +1,44 @@
 package tests;
 
 import entities.Client;
+import entities.Reclamation;
 import services.ServiceClient;
+import services.ServiceReclamation;
 
 import java.sql.SQLException;
 
 public class Main {
     public static void main(String[] args) {
-        ServiceClient serviceClient = new ServiceClient();
-
-        System.out.println("Travel Agency Client Management");
+        ServiceClient clientService = new ServiceClient();
+        ServiceReclamation reclamationService = new ServiceReclamation();
 
         try {
-            // Example Client usage
-            Client newClient = new Client(
-                    "Doe",
+            // Create a client (if not exists)
+            Client client = new Client(
+                    "Smith",
                     "John",
-                    "john.doe@example.com",
-                    12345678,
-                    "15/01/1990",
-                    "securePassword123"
+                    "john.smith@example.com",
+                    98765432,
+                    "20/05/1985",
+                    "password123"
             );
+            clientService.ajouter(client);
 
-            // Add client to database
-            serviceClient.ajouter(newClient);
-            System.out.println("Client added successfully!");
-
-            // Retrieve all clients
-            System.out.println("\nAll registered clients:");
-            serviceClient.recuperer().forEach(client ->
-                    System.out.println("- " + client.getPrenom() + " " + client.getNom())
+            // Create a reclamation for this client
+            Reclamation reclamation = new Reclamation(
+                    client.getId(),  // Linking to the client
+                    "Service Quality",
+                    "15/06/2023",
+                    "The service was not as described in the brochure."
             );
+            reclamationService.ajouter(reclamation);
+
+            // Get all reclamations for this client
+            System.out.println("Reclamations for client " + client.getNom() + ":");
+            reclamationService.getByClient(client.getId()).forEach(System.out::println);
 
         } catch (SQLException e) {
-            System.err.println("Database error: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 }
