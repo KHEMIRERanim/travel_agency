@@ -1,21 +1,18 @@
 package tests;
 
-import entities.Flight;
 import entities.Client;
-import services.ServiceFlight;
 import services.ServiceClient;
 
 import java.sql.SQLException;
 
 public class Main {
     public static void main(String[] args) {
-        ServiceFlight serviceFlight = new ServiceFlight();
-
         ServiceClient serviceClient = new ServiceClient();
 
-        System.out.println("Hello World!");
+        System.out.println("Travel Agency Client Management");
 
         try {
+            // Example Client usage
             Client newClient = new Client(
                     "Doe",
                     "John",
@@ -25,16 +22,18 @@ public class Main {
                     "securePassword123"
             );
 
+            // Add client to database
             serviceClient.ajouter(newClient);
             System.out.println("Client added successfully!");
 
-            System.out.println("All clients:");
+            // Retrieve all clients
+            System.out.println("\nAll registered clients:");
             serviceClient.recuperer().forEach(client ->
-                    System.out.println(client.getNom() + " " + client.getPrenom())
+                    System.out.println("- " + client.getPrenom() + " " + client.getNom())
             );
 
         } catch (SQLException e) {
-            System.err.println("Error working with Client: " + e.getMessage());
+            System.err.println("Database error: " + e.getMessage());
         }
     }
 }
