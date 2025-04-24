@@ -16,43 +16,48 @@ public class ServiceFlight implements IService<Flight> {
     }
     @Override
     public void ajouter(Flight flight) throws SQLException {
-        String req = "INSERT INTO flight (flight_number, departure, destination, departure_time, arrival_time, flight_date, flight_duration, available_seats, airline, price) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String req = "INSERT INTO flight (departure, destination, departure_time, arrival_time, flight_date, flight_duration, flight_number, airline, available_seats, price) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
         PreparedStatement ps = con.prepareStatement(req);
-        ps.setString(1, flight.getFlight_number());
-        ps.setString(2, flight.getDeparture());
-        ps.setString(3, flight.getDestination());
-        ps.setTimestamp(4, flight.getDeparture_Time());
-        ps.setTimestamp(5, flight.getArrival_Time());
-        ps.setDate(6, flight.getFlight_date());
-        ps.setInt(7, flight.getFlight_duration());
-        ps.setInt(8, flight.getAvailable_seats());
-        ps.setString(9, flight.getAirline());
-        ps.setDouble(10, flight.getPrice());
+
+        // Remplir les paramètres dans le bon ordre, sans flight_id car c'est auto-incrémenté
+        ps.setString(1, flight.getDeparture());         // departure
+        ps.setString(2, flight.getDestination());        // destination
+        ps.setTimestamp(3, flight.getDeparture_Time());   // departure_time
+        ps.setTimestamp(4, flight.getArrival_Time());     // arrival_time
+        ps.setDate(5, flight.getFlight_date());           // flight_date
+        ps.setInt(6, flight.getFlight_duration());        // flight_duration
+        ps.setString(7, flight.getFlight_number());       // flight_number
+        ps.setString(8, flight.getAirline());            // airline
+        ps.setInt(9, flight.getAvailable_seats());        // available_seats
+        ps.setDouble(10, flight.getPrice());             // price
 
         ps.executeUpdate();
-        System.out.println("vol ajouté");
+        System.out.println("Vol ajouté");
     }
 
 
     @Override
     public void modifier(Flight flight) throws SQLException {
-        String req = "UPDATE flight SET flight_number=?, departure=?, destination=?, " +
-                "departure_time=?, arrival_time=?, flight_date=?, flight_duration=?, " +
-                "available_seats=?, airline=?, price=? WHERE flight_id=?";
+        String req = "UPDATE flight SET departure=?, destination=?, departure_time=?, arrival_time=?, " +
+                "flight_date=?, flight_duration=?, flight_number=?, airline=?, available_seats=?, price=? " +
+                "WHERE flight_id=?";
         PreparedStatement ps = con.prepareStatement(req);
 
-        ps.setString(1, flight.getFlight_number());
-        ps.setString(2, flight.getDeparture());
-        ps.setString(3, flight.getDestination());
-        ps.setTimestamp(4, flight.getDeparture_Time());
-        ps.setTimestamp(5, flight.getArrival_Time());
-        ps.setDate(6, new java.sql.Date(flight.getFlight_date().getTime()));
-        ps.setInt(7, flight.getFlight_duration());
-        ps.setInt(8, flight.getAvailable_seats());
-        ps.setString(9, flight.getAirline());
+        // Respecter l'ordre : departure, destination, departure_time, arrival_time,
+        // flight_date, flight_duration, flight_number, airline, available_seats, price
+        ps.setString(1, flight.getDeparture());
+        ps.setString(2, flight.getDestination());
+        ps.setTimestamp(3, flight.getDeparture_Time());
+        ps.setTimestamp(4, flight.getArrival_Time());
+        ps.setDate(5, new java.sql.Date(flight.getFlight_date().getTime()));
+        ps.setInt(6, flight.getFlight_duration());
+        ps.setString(7, flight.getFlight_number());
+        ps.setString(8, flight.getAirline());
+        ps.setInt(9, flight.getAvailable_seats());
         ps.setDouble(10, flight.getPrice());
-        ps.setInt(11, flight.getFlight_id());
+        ps.setInt(11, flight.getFlight_id()); // WHERE condition
 
         ps.executeUpdate();
         System.out.println("Vol modifié");
@@ -60,7 +65,7 @@ public class ServiceFlight implements IService<Flight> {
 
 
 
-@Override
+    @Override
 public void supprimer(Flight flight) throws SQLException {
     String req = "DELETE FROM flight WHERE flight_id=?";
     PreparedStatement ps = con.prepareStatement(req);
@@ -78,17 +83,18 @@ public void supprimer(Flight flight) throws SQLException {
         ResultSet rs = st.executeQuery(req);
 
         while (rs.next()) {
-            int flight_id = rs.getInt("flight_id");
-            String flight_number = rs.getString("flight_number");
-            String departure = rs.getString("departure");
-            String destination = rs.getString("destination");
-            Timestamp departure_time = rs.getTimestamp("departure_time");
-            Timestamp arrival_time = rs.getTimestamp("arrival_time");
-            Date flight_date = rs.getDate("flight_date");
-            int flight_duration = rs.getInt("flight_duration");
-            int available_seats = rs.getInt("available_seats");
-            String airline = rs.getString("airline");
-            double price = rs.getDouble("price");
+            // Adapter l'ordre des colonnes ici en fonction de l'ordre de ta base
+            int flight_id = rs.getInt("flight_id"); // flight_id
+            String departure = rs.getString("departure"); // departure
+            String destination = rs.getString("destination"); // destination
+            Timestamp departure_time = rs.getTimestamp("departure_time"); // departure_time
+            Timestamp arrival_time = rs.getTimestamp("arrival_time"); // arrival_time
+            Date flight_date = rs.getDate("flight_date"); // flight_date
+            int flight_duration = rs.getInt("flight_duration"); // flight_duration
+            String flight_number = rs.getString("flight_number"); // flight_number
+            String airline = rs.getString("airline"); // airline
+            int available_seats = rs.getInt("available_seats"); // available_seats
+            double price = rs.getDouble("price"); // price
 
             // Création de l'objet Flight avec les données récupérées
             Flight flight = new Flight(flight_id, flight_duration, flight_number, available_seats,
@@ -99,5 +105,6 @@ public void supprimer(Flight flight) throws SQLException {
 
         return flights;
     }
+
 
 }
