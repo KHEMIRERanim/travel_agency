@@ -30,6 +30,10 @@ public class Client {
         this.mot_de_passe = mot_de_passe;
     }
 
+    public Client() {
+
+    }
+
     public int getId() {
         return id;
     }

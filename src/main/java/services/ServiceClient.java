@@ -79,4 +79,30 @@ public class ServiceClient implements IService<Client> {
 
         return clients;
     }
-}
+    // In services/ServiceClient.java
+    public boolean emailExists(String email) throws SQLException {
+        String sql = "SELECT 1 FROM client WHERE email = ? LIMIT 1";
+        PreparedStatement ps = con.prepareStatement(sql);
+        ps.setString(1, email);
+        return ps.executeQuery().next(); // Returns true if email exists
+    }
+
+    public Client getById(int id) throws SQLException {
+        String sql = "SELECT * FROM client WHERE id = ?";
+        PreparedStatement ps = con.prepareStatement(sql);
+        ps.setInt(1, id);
+        ResultSet rs = ps.executeQuery();
+
+        if (rs.next()) {
+            return new Client(
+                    rs.getInt("id"),
+                    rs.getString("nom"),
+                    rs.getString("prenom"),
+                    rs.getString("email"),
+                    rs.getInt("numero_telephone"),
+                    rs.getString("date_de_naissance"),
+                    rs.getString("mot_de_passe")
+            );
+        }
+        return null;
+    }}
