@@ -3,7 +3,7 @@ package entities;
 import java.util.regex.Pattern;
 
 public class Client {
-    private int id;
+    private int id_client;  // Changed from id to id_client
     private String nom;
     private String prenom;
     private String email;
@@ -11,8 +11,10 @@ public class Client {
     private String date_de_naissance;
     private String mot_de_passe;
 
-    public Client(int id, String nom, String prenom, String email, int numero_telephone, String date_de_naissance, String mot_de_passe) {
-        this.id = id;
+    // Constructors
+    public Client(int id_client, String nom, String prenom, String email,
+                  int numero_telephone, String date_de_naissance, String mot_de_passe) {
+        this.id_client = id_client;
         this.nom = nom;
         this.prenom = prenom;
         setEmail(email);
@@ -21,25 +23,20 @@ public class Client {
         this.mot_de_passe = mot_de_passe;
     }
 
-    public Client(String nom, String prenom, String email, int numero_telephone, String date_de_naissance, String mot_de_passe) {
-        this.nom = nom;
-        this.prenom = prenom;
-        setEmail(email);
-        setNumero_telephone(numero_telephone);
-        setDate_de_naissance(date_de_naissance);
-        this.mot_de_passe = mot_de_passe;
+    public Client(String nom, String prenom, String email, int numero_telephone,
+                  String date_de_naissance, String mot_de_passe) {
+        this(0, nom, prenom, email, numero_telephone, date_de_naissance, mot_de_passe);
     }
 
-    public Client() {
+    public Client() {}
 
+    // Getters and Setters
+    public int getId_client() {
+        return id_client;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
+    public void setId_client(int id_client) {
+        this.id_client = id_client;
     }
 
     public String getNom() {
@@ -63,11 +60,10 @@ public class Client {
     }
 
     public void setEmail(String email) {
-        if (email.contains("@")) {
-            this.email = email;
-        } else {
+        if (email == null || !email.contains("@")) {
             throw new IllegalArgumentException("Email must contain '@'");
         }
+        this.email = email;
     }
 
     public int getNumero_telephone() {
@@ -75,11 +71,10 @@ public class Client {
     }
 
     public void setNumero_telephone(int numero_telephone) {
-        if (String.valueOf(numero_telephone).length() == 8) {
-            this.numero_telephone = numero_telephone;
-        } else {
+        if (String.valueOf(numero_telephone).length() != 8) {
             throw new IllegalArgumentException("Phone number must be 8 digits");
         }
+        this.numero_telephone = numero_telephone;
     }
 
     public String getDate_de_naissance() {
@@ -87,11 +82,10 @@ public class Client {
     }
 
     public void setDate_de_naissance(String date_de_naissance) {
-        if (Pattern.matches("^\\d{2}/\\d{2}/\\d{4}$", date_de_naissance)) {
-            this.date_de_naissance = date_de_naissance;
-        } else {
+        if (!Pattern.matches("^\\d{2}/\\d{2}/\\d{4}$", date_de_naissance)) {
             throw new IllegalArgumentException("Date must be in format jj/mm/aaaa");
         }
+        this.date_de_naissance = date_de_naissance;
     }
 
     public String getMot_de_passe() {
@@ -99,19 +93,21 @@ public class Client {
     }
 
     public void setMot_de_passe(String mot_de_passe) {
+        if (mot_de_passe == null || mot_de_passe.trim().isEmpty()) {
+            throw new IllegalArgumentException("Password cannot be empty");
+        }
         this.mot_de_passe = mot_de_passe;
     }
 
     @Override
     public String toString() {
         return "Client{" +
-                "id=" + id +
+                "id_client=" + id_client +
                 ", nom='" + nom + '\'' +
                 ", prenom='" + prenom + '\'' +
                 ", email='" + email + '\'' +
                 ", numero_telephone=" + numero_telephone +
                 ", date_de_naissance='" + date_de_naissance + '\'' +
-                ", mot_de_passe='" + mot_de_passe + '\'' +
-                '}';
+                '}';  // Password intentionally excluded from toString()
     }
 }

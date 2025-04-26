@@ -18,7 +18,7 @@ public class ServiceClient implements IService<Client> {
     public void ajouter(Client client) throws SQLException {
         String req = "INSERT INTO client (nom, prenom, email, numero_telephone, date_de_naissance, mot_de_passe) VALUES (?, ?, ?, ?, ?, ?)";
 
-        PreparedStatement ps = con.prepareStatement(req);
+        PreparedStatement ps = con.prepareStatement(req, Statement.RETURN_GENERATED_KEYS);
         ps.setString(1, client.getNom());
         ps.setString(2, client.getPrenom());
         ps.setString(3, client.getEmail());
@@ -27,13 +27,19 @@ public class ServiceClient implements IService<Client> {
         ps.setString(6, client.getMot_de_passe());
 
         ps.executeUpdate();
-        System.out.println("Client ajouté");
+
+        // Set the generated id_client
+        ResultSet rs = ps.getGeneratedKeys();
+        if (rs.next()) {
+            client.setId_client(rs.getInt(1));
+        }
+        System.out.println("Client ajouté avec ID: " + client.getId_client());
     }
 
     @Override
     public void modifier(Client client) throws SQLException {
         String req = "UPDATE client SET nom=?, prenom=?, email=?, " +
-                "numero_telephone=?, date_de_naissance=?, mot_de_passe=? WHERE id=?";
+                "numero_telephone=?, date_de_naissance=?, mot_de_passe=? WHERE id_client=?";
         PreparedStatement ps = con.prepareStatement(req);
 
         ps.setString(1, client.getNom());
@@ -42,7 +48,7 @@ public class ServiceClient implements IService<Client> {
         ps.setInt(4, client.getNumero_telephone());
         ps.setString(5, client.getDate_de_naissance());
         ps.setString(6, client.getMot_de_passe());
-        ps.setInt(7, client.getId());
+        ps.setInt(7, client.getId_client());
 
         ps.executeUpdate();
         System.out.println("Client modifié");
@@ -50,9 +56,9 @@ public class ServiceClient implements IService<Client> {
 
     @Override
     public void supprimer(Client client) throws SQLException {
-        String req = "DELETE FROM client WHERE id=?";
+        String req = "DELETE FROM client WHERE id_client=?";
         PreparedStatement ps = con.prepareStatement(req);
-        ps.setInt(1, client.getId());
+        ps.setInt(1, client.getId_client());
         ps.executeUpdate();
         System.out.println("Client supprimé");
     }
@@ -65,37 +71,37 @@ public class ServiceClient implements IService<Client> {
         ResultSet rs = st.executeQuery(req);
 
         while (rs.next()) {
-            int id = rs.getInt("id");
-            String nom = rs.getString("nom");
-            String prenom = rs.getString("prenom");
-            String email = rs.getString("email");
-            int numero_telephone = rs.getInt("numero_telephone");
-            String date_de_naissance = rs.getString("date_de_naissance");
-            String mot_de_passe = rs.getString("mot_de_passe");
-
-            Client client = new Client(id, nom, prenom, email, numero_telephone, date_de_naissance, mot_de_passe);
+            Client client = new Client(
+                    rs.getInt("id_client"),
+                    rs.getString("nom"),
+                    rs.getString("prenom"),
+                    rs.getString("email"),
+                    rs.getInt("numero_telephone"),
+                    rs.getString("date_de_naissance"),
+                    rs.getString("mot_de_passe")
+            );
             clients.add(client);
         }
 
         return clients;
     }
-    // In services/ServiceClient.java
+
     public boolean emailExists(String email) throws SQLException {
         String sql = "SELECT 1 FROM client WHERE email = ? LIMIT 1";
         PreparedStatement ps = con.prepareStatement(sql);
         ps.setString(1, email);
-        return ps.executeQuery().next(); // Returns true if email exists
+        return ps.executeQuery().next();
     }
 
-    public Client getById(int id) throws SQLException {
-        String sql = "SELECT * FROM client WHERE id = ?";
+    public Client getById(int id_client) throws SQLException {
+        String sql = "SELECT * FROM client WHERE id_client = ?";
         PreparedStatement ps = con.prepareStatement(sql);
-        ps.setInt(1, id);
+        ps.setInt(1, id_client);
         ResultSet rs = ps.executeQuery();
 
         if (rs.next()) {
             return new Client(
-                    rs.getInt("id"),
+                    rs.getInt("id_client"),
                     rs.getString("nom"),
                     rs.getString("prenom"),
                     rs.getString("email"),
@@ -105,4 +111,5 @@ public class ServiceClient implements IService<Client> {
             );
         }
         return null;
-    }}
+    }
+}
